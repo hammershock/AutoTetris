@@ -87,7 +87,7 @@ class State:
         orient, x0, _ = max((x for x in self.next_states(name)), key=lambda x: x[1].score())
         return orient, x0
     
-    def best2(self, val1, val2, accelerate=True):
+    def best2(self, val1, val2, accelerate=False):
         if accelerate:
             sys.path.append('./cpp/build')
             try:
@@ -220,7 +220,7 @@ class PyTris:
         self.pos_y = - y_min
         
         if autoplay:
-            self.orient, self.pos_x = self.state.best2(self.val, next_val)
+            self.orient, self.pos_x = self.state.best2(self.val, next_val, accelerate=True)
         else:
             self.pos_x = random.randint(-x_min, self.w - 1 - x_max)
         

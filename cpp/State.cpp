@@ -4,6 +4,7 @@
 #include<unordered_set>
 #include<tuple>
 #include<queue>
+#include<cmath>
 #include<memory>
 #include"Piece.hpp"
 #include"State.hpp"
@@ -203,7 +204,7 @@ pair<int, int> State::best2(int val1, int val2){
         auto ret2 = state->nextStates(val2, piece_map);
         
         for (auto &[orient2, x02, state2]: ret2){
-            int score = state2->score();
+            int score = state2->score() + state->score();
             if (score > max_score){
                 max_score = score;
                 max_orient = orient;
