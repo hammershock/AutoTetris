@@ -195,10 +195,11 @@ for (auto &[orient, x0, state]: ret){
 return make_pair(max_orient, max_x0);
 }
 
-pair<int, int> State::best2(int val1, int val2){
+std::pair<int, int> State::best2(int val1, int val2){
     std::unordered_map<int, Piece> piece_map = create_pieces();
     int max_score = INT16_MIN;
     int max_orient = -1, max_x0 = -1;
+
     auto ret = this->nextStates(val1, piece_map);
     for (auto &[orient, x0, state]: ret){
         auto ret2 = state->nextStates(val2, piece_map);

@@ -96,37 +96,35 @@ class TetrisGUI:
                         elif event.key == pygame.K_RIGHT:
                             self.game.move_piece(1, 0)
                         elif event.key == pygame.K_DOWN:
-                            while self.game.move_piece(0, 1):
-                                pass
-                        
+                            self.game.drop()
                         elif event.key == pygame.K_UP and not self.game.game_over:
                             self.game.rotate_piece()
                         elif self.game.game_over and event.key == pygame.K_SPACE:
                             self.game.start_game()
             
             # 自动下落逻辑
-            if self.drop_interval < 0:
+            if self.drop_interval < 0:  # 小于0直接落底
                 p_bar.update()
                 p_bar.set_postfix(score=self.game.score)
-                while self.game.move_piece(0, 1):
-                    pass
+                self.game.drop()
+                
             elif (self.drop_interval != 0 and
                     pygame.time.get_ticks() - last_fall_time > self.drop_interval * 1000):  # 2s
                 self.game.move_piece(0, 1)
                 last_fall_time = pygame.time.get_ticks()
             
-            if not self.headless:
+            if self.headless:
+                if self.game.game_over:
+                    p_bar.close()
+                    p_bar = tqdm()
+                    input('Press any key to restart')
+                    self.game.start_game()
+            else:
                 self.clock.tick(self.fps)  # 稳定以fps循环
-            
-            if self.headless and self.game.game_over:
-                p_bar.close()
-                p_bar = tqdm()
-                input('Press any key to restart')
-                self.game.start_game()
 
 
 if __name__ == '__main__':
-    game = PyTris(w=15, h=25, autoplay=True, turbo=True)
+    game = PyTris(w=10, h=20, autoplay=True, turbo=True)
     gui = TetrisGUI(game, drop_interval=-1, fps=60, headless=True)
     game.start_game()
     gui.run()

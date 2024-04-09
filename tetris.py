@@ -92,7 +92,9 @@ class State:
             sys.path.append('./cpp/build')
             try:
                 if len(glob.glob(f'cpp/build/*.so')):
-                    return self.best2_c(val1, val2)
+                    orient, x0 = self.best2_c(val1, val2)
+                    
+                    return orient, x0
                 else:
                     warnings.warn('cpp extension not found, please run build.sh to build it first!')
             except ImportError as e:
@@ -250,7 +252,7 @@ class PyTris:
                 
         self.view = new_view
         self.orient = new_orient
-    
+        
     def move_piece(self, dir_x, dir_y):
         if self.game_over:
             return
@@ -263,7 +265,7 @@ class PyTris:
             
             if x < 0 or x >= self.w or y < 0 or y >= self.h or self.state.board[y, x] > 0:
                 if (dir_x, dir_y) == (0, 1):  # 成功触底
-                    self.state.board = self.view.copy()  # 固定状态
+                    self.state.board = self.view.copy()
                     self.score += self.check_line_clear()  # 更新得分
                     self.game_over = self.state.is_over()  # 判断胜负
                     if not self.game_over:
@@ -277,6 +279,10 @@ class PyTris:
         self.view = new_view
         return True
     
+    def drop(self):
+        while self.move_piece(0, 1):
+            pass
+
     def check_line_clear(self):
         new_grid = []
         lines_cleared = 0
