@@ -104,7 +104,7 @@ class State:
         best_x0 = None
         for orient, x0, state in self.next_states(val1):
             for _, _, state2 in state.next_states(val2):
-                score = state2.score()
+                score = state2.score() + state.score()
                 if score > best_score:
                     best_score = score
                     best_orient = orient
