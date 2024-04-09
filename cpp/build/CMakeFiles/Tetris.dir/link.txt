@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -flto -shared  -o Tetris.cpython-311-x86_64-linux-gnu.so CMakeFiles/Tetris.dir/Tetris.cpp.o CMakeFiles/Tetris.dir/State.cpp.o CMakeFiles/Tetris.dir/Piece.cpp.o CMakeFiles/Tetris.dir/main.cpp.o 

@@ -1,3 +1,0 @@
-/home/hammer/Documents/PycharmProjects/Tetris/cpp/build/CMakeFiles/Tetris.dir
-/home/hammer/Documents/PycharmProjects/Tetris/cpp/build/CMakeFiles/edit_cache.dir
-/home/hammer/Documents/PycharmProjects/Tetris/cpp/build/CMakeFiles/rebuild_cache.dir
