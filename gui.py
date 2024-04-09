@@ -1,14 +1,16 @@
 import pygame
+from tqdm import tqdm
 
 from tetris import PyTris
 
 
 class TetrisGUI:
-    def __init__(self, game: PyTris, cell_size=30, fps=30, drop_interval=2.0):
+    def __init__(self, game: PyTris, cell_size=30, fps=30, drop_interval=2.0, headless=False):
         self.game = game
         self.cell_size = cell_size
         self.fps = fps
         self.drop_interval = drop_interval  # 下落时间间隔， 0不自动下落，负数立即下落
+        self.headless = headless  # 是否开启无头模式，即可以不显示画面
         
         self.colors = [
             (0, 0, 0),
@@ -21,11 +23,14 @@ class TetrisGUI:
             (144, 79, 85)
         ]
         self.names = {1: 'I', 2: 'J', 3: 'L', 4: 'O', 5: 'S', 6: 'T', 7: 'Z'}
-        pygame.init()
-        self.screen = pygame.display.set_mode((game.w * cell_size, game.h * cell_size))
-        pygame.display.set_caption('PyTris')
+        
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.SysFont("Arial", 24)
+        if not self.headless:
+            pygame.init()
+            self.screen = pygame.display.set_mode((game.w * cell_size, game.h * cell_size))
+            pygame.display.set_caption('PyTris')
+            
+            self.font = pygame.font.SysFont("Arial", 24)
     
     def draw_block_with_shadow(self, x, y, color):
         # 绘制小方块本身
@@ -68,35 +73,41 @@ class TetrisGUI:
     def run(self):
         running = True
         last_fall_time = pygame.time.get_ticks()
+        p_bar = tqdm()
         while running:
-            self.screen.fill((0, 0, 0))
-            self.draw_grid()
-            self.draw_text(f'Score: {self.game.score}', (10, 10))
-            self.draw_text(f'Next: {self.names[self.game.shape_queue[1][0]]}', (10, 30), (255, 255, 0))
-            if self.game.game_over:
-                self.draw_text('Game Over', (10, 50), (255, 0, 0))
-                
-            pygame.display.flip()
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        self.game.move_piece(-1, 0)
-                    elif event.key == pygame.K_RIGHT:
-                        self.game.move_piece(1, 0)
-                    elif event.key == pygame.K_DOWN:
-                        while self.game.move_piece(0, 1):
-                            pass
+            if not self.headless:
+                # 显示
+                self.screen.fill((0, 0, 0))
+                self.draw_grid()
+                self.draw_text(f'Score: {self.game.score}', (10, 10))
+                self.draw_text(f'Next: {self.names[self.game.shape_queue[1][0]]}', (10, 30), (255, 255, 0))
+                if self.game.game_over:
+                    self.draw_text('Game Over', (10, 50), (255, 0, 0))
                     
-                    elif event.key == pygame.K_UP and not self.game.game_over:
-                        self.game.rotate_piece()
-                    elif self.game.game_over and event.key == pygame.K_SPACE:
-                        self.game.start_game()
+                pygame.display.flip()
+                
+                # 响应事件
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_LEFT:
+                            self.game.move_piece(-1, 0)
+                        elif event.key == pygame.K_RIGHT:
+                            self.game.move_piece(1, 0)
+                        elif event.key == pygame.K_DOWN:
+                            while self.game.move_piece(0, 1):
+                                pass
+                        
+                        elif event.key == pygame.K_UP and not self.game.game_over:
+                            self.game.rotate_piece()
+                        elif self.game.game_over and event.key == pygame.K_SPACE:
+                            self.game.start_game()
             
             # 自动下落逻辑
             if self.drop_interval < 0:
+                p_bar.update()
+                p_bar.set_postfix(score=self.game.score)
                 while self.game.move_piece(0, 1):
                     pass
             elif (self.drop_interval != 0 and
@@ -104,11 +115,12 @@ class TetrisGUI:
                 self.game.move_piece(0, 1)
                 last_fall_time = pygame.time.get_ticks()
             
-            self.clock.tick(self.fps)
+            if not self.headless:
+                self.clock.tick(self.fps)  # 稳定以fps循环
 
 
 if __name__ == '__main__':
-    game = PyTris(w=15, h=25, autoplay=True)
-    gui = TetrisGUI(game, drop_interval=-1, fps=60)
+    game = PyTris(w=15, h=25, autoplay=True, turbo=True)
+    gui = TetrisGUI(game, drop_interval=-1, fps=60, headless=True)
     game.start_game()
     gui.run()

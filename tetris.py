@@ -178,10 +178,11 @@ class State:
 
 
 class PyTris:
-    def __init__(self, w=10, h=20, autoplay=False):
+    def __init__(self, w=10, h=20, autoplay=False, turbo=False):
         self.w = w
         self.h = h
         self.autoplay = autoplay
+        self.turbo = turbo
         
         self.state = State(np.zeros((h, w)))
         self.view = np.zeros_like(self.state.board)  # 实际显示时绘制的视图
@@ -220,7 +221,7 @@ class PyTris:
         self.pos_y = - y_min
         
         if autoplay:
-            self.orient, self.pos_x = self.state.best2(self.val, next_val, accelerate=True)
+            self.orient, self.pos_x = self.state.best2(self.val, next_val, accelerate=self.turbo)
         else:
             self.pos_x = random.randint(-x_min, self.w - 1 - x_max)
         
