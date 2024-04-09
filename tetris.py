@@ -1,10 +1,10 @@
 import glob
 import sys
 import warnings
-
-import numpy as np
 import random
 from collections import deque
+
+import numpy as np
 
 
 def rotate(shape, orient: int):
