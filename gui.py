@@ -117,6 +117,12 @@ class TetrisGUI:
             
             if not self.headless:
                 self.clock.tick(self.fps)  # 稳定以fps循环
+            
+            if self.headless and self.game.game_over:
+                p_bar.close()
+                p_bar = tqdm()
+                input('Press any key to restart')
+                self.game.start_game()
 
 
 if __name__ == '__main__':
