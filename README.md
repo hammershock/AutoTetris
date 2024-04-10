@@ -11,7 +11,7 @@
 - `width` 棋盘宽度
 - `height` 棋盘高度
 - `autoplay`是否开启自动决策
-- `turbo`是否开启加速推理（需要编译, build.sh）。且除了medium的所有模式都需要在turbo模式下运行
+- `turbo`是否开启加速推理（需要编译, build.sh）。**目前除了medium的所有模式都需要在turbo模式下运行**
 - `mode` 难度等级：easy, medium, hard, extreme；
   - easy:  下一个方块以概率1-p出现最有利于玩家的那一个
   - medium: 下一个方块完全随机出现
