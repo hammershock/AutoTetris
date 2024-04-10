@@ -7,5 +7,20 @@
 
 - 空格键重新开始游戏
 
+## 可选参数：
+
+- `autoplay`是否开启自动决策
+- `turbo`是否开启加速推理（需要编译, build.sh）。且除了medium的所有模式都需要在turbo模式下运行
+- `mode` 难度等级：easy, medium, hard, extreme；
+  - easy:  下一个方块以概率1-p出现最有利于玩家的那一个
+  - medium: 下一个方块完全随机出现
+  - hard: 下一个方块以概率p出现最不利于玩家的那一个
+  - extreme: 禁用下一个方块提示，且当前方块以概率p出现最不利于玩家的那一个
+- `p` 可以进一步调节难度，越大越难，范围在0-1之间
+- `drop_interval` 方块下落时间间隔，置0不自动下落，负值立即下落
+- `fps` 游戏GUI刷新帧率
+- `headless` 开启无头模式，即不显示GUI，以最大速率运行
+
+  
 [参考资料](https://blog.csdn.net/Originum/article/details/81570042 "俄罗斯方块人工智能 [AI]")
 
