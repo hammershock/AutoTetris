@@ -254,7 +254,7 @@ class PyTris:
         Mode.easy: 下一个方块以概率1-p出现最有利于玩家的那一个
         Mode.medium: 下一个方块完全随机出现
         Mode.hard: 下一个方块以概率p出现最不利于玩家的那一个
-        Mode.extreme: 禁用下一个方块提示，当前方块以概率p出现最不利于玩家的那一个
+        Mode.extreme: 禁用下一个方块提示，且当前方块以概率p出现最不利于玩家的那一个
         """
         self.val = random.choice(list(shapes_.keys()))
         self.next = random.choice(list(shapes.keys()))

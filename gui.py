@@ -1,3 +1,5 @@
+import argparse
+
 import pygame
 from tqdm import tqdm
 
@@ -124,8 +126,35 @@ class TetrisGUI:
                 self.clock.tick(self.fps)  # 稳定以fps循环
 
 
-if __name__ == '__main__':
-    game = PyTris(w=10, h=20, autoplay=True, turbo=True, mode=Mode.easy, p=0.1)
-    gui = TetrisGUI(game, drop_interval=-2, fps=60, headless=False)
+def main():
+    parser = argparse.ArgumentParser(description="Start Game PyTris")
+    parser.add_argument("--width", "-W", type=int, default=10, help="游戏区域的宽度")
+    parser.add_argument("--height", "-H", type=int, default=20, help="游戏区域的高度")
+    parser.add_argument("--autoplay", action="store_true", help="启用自动播放模式")
+    parser.add_argument("--turbo", action="store_true", help="启用加速模式")
+    parser.add_argument("--mode", type=str, choices=['easy', 'medium', 'hard'], default="easy", help="游戏难度模式")
+    parser.add_argument("--probability", "-p", type=float, default=0.1, help="特殊方块出现的概率")
+    parser.add_argument("--drop-interval", type=float, default=1.0, help="方块下落间隔")
+    parser.add_argument("--fps", type=int, default=60, help="帧率")
+    parser.add_argument("--headless", action="store_true", help="启用无头模式（不显示GUI）")
+    
+    args = parser.parse_args()
+    
+    mode_mapping = {
+        'easy': Mode.easy,
+        'medium': Mode.medium,
+        'hard': Mode.hard,
+    }
+    
+    game_mode = mode_mapping.get(args.mode, Mode.easy)
+    
+    game = PyTris(w=args.width, h=args.height, autoplay=args.autoplay, turbo=args.turbo, mode=game_mode,
+                  p=args.probability)
+    gui = TetrisGUI(game, drop_interval=args.drop_interval, fps=args.fps, headless=args.headless)
     game.start_game()
     gui.run()
+
+
+if __name__ == '__main__':
+    main()
+    
