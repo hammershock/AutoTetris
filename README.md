@@ -23,13 +23,18 @@
 - `fps` 游戏GUI刷新帧率
 - `headless` 开启无头模式，即不显示GUI，以最大速率运行
 
-比如：
+简单模式，立即下落，自动模式：
 ```bash
  python gui.py --autoplay --turbo --drop-interval -1 --mode easy
 ```
-  
+
+中等难度，立即下落，自动模式，不显示界面
 ```bash
 python gui.py --autoplay --turbo --drop-interval -1 --mode medium --headless
+```
+
+```bash
+python gui.py --turbo --drop-interval 2 --mode extreme -p 1
 ```
 [参考资料](https://blog.csdn.net/Originum/article/details/81570042 "俄罗斯方块人工智能 [AI]")
 

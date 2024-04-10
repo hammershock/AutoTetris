@@ -24,6 +24,8 @@ shapes_ = {1: [(0, -1), (0, 0), (0, 1), (0, 2)],
 
 shapes = {(val, orient): tuple(rotate(shapes_[val], orient)) for val in shapes_.keys() for orient in range(4)}
 
+cache = {}
+
 
 class Mode(Enum):
     very_easy = auto()
