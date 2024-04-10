@@ -1,7 +1,7 @@
 import pygame
 from tqdm import tqdm
 
-from tetris import PyTris
+from tetris import PyTris, Mode
 
 
 class TetrisGUI:
@@ -57,7 +57,7 @@ class TetrisGUI:
         pygame.draw.line(self.screen, shadow_color_lighter,
                          (x * self.cell_size, y * self.cell_size),
                          (x * self.cell_size, (y + 1) * self.cell_size), 2)  # 左边缘
-        
+    
     def draw_grid(self):
         for y in range(self.game.h):
             for x in range(self.game.w):
@@ -80,10 +80,11 @@ class TetrisGUI:
                 self.screen.fill((0, 0, 0))
                 self.draw_grid()
                 self.draw_text(f'Score: {self.game.score}', (10, 10))
-                self.draw_text(f'Next: {self.names[self.game.shape_queue[1][0]]}', (10, 30), (255, 255, 0))
+                self.draw_text(f'Next: {self.names[self.game.next[0]] if self.game.next is not None else "???"}',
+                               (10, 30), (255, 255, 0))
                 if self.game.game_over:
                     self.draw_text('Game Over', (10, 50), (255, 0, 0))
-                    
+                
                 pygame.display.flip()
                 
                 # 响应事件
@@ -107,9 +108,9 @@ class TetrisGUI:
                 p_bar.update()
                 p_bar.set_postfix(score=self.game.score)
                 self.game.drop()
-                
+            
             elif (self.drop_interval != 0 and
-                    pygame.time.get_ticks() - last_fall_time > self.drop_interval * 1000):  # 2s
+                  pygame.time.get_ticks() - last_fall_time > self.drop_interval * 1000):  # 2s
                 self.game.move_piece(0, 1)
                 last_fall_time = pygame.time.get_ticks()
             
@@ -124,7 +125,7 @@ class TetrisGUI:
 
 
 if __name__ == '__main__':
-    game = PyTris(w=10, h=20, autoplay=True, turbo=True)
-    gui = TetrisGUI(game, drop_interval=-1, fps=60, headless=True)
+    game = PyTris(w=10, h=20, autoplay=True, turbo=True, mode=Mode.medium)
+    gui = TetrisGUI(game, drop_interval=2, fps=60, headless=False)
     game.start_game()
     gui.run()

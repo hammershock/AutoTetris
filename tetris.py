@@ -2,7 +2,7 @@ import glob
 import sys
 import warnings
 import random
-from collections import deque
+from enum import Enum, auto
 
 import numpy as np
 
@@ -25,6 +25,13 @@ shapes_ = {1: [(0, -1), (0, 0), (0, 1), (0, 2)],
 shapes = {(val, orient): tuple(rotate(shapes_[val], orient)) for val in shapes_.keys() for orient in range(4)}
 
 
+class Mode(Enum):
+    easy = auto()
+    medium = auto()
+    hard = auto()
+    extreme = auto()
+    
+    
 class State:
     def __init__(self, board, landing_height=0):
         self.board: np.ndarray = board.copy()
@@ -78,18 +85,37 @@ class State:
                 - 3.3855972247263626 * self.well_sum())
     
     def best2_c(self, val1, val2):
+        sys.path.append('./cpp/build')
         import Tetris
         state = Tetris.State(self.board.astype(int).tolist())
         orient, x0 = state.best2(val1, val2)
         return orient, x0
     
-    def best1(self, name):
-        orient, x0, _ = max((x for x in self.next_states(name)), key=lambda x: x[1].score())
+    def best1_c(self, val):
+        sys.path.append('./cpp/build')
+        import Tetris
+        state = Tetris.State(self.board.astype(int).tolist())
+        orient, x0 = state.best1(val)
+        return orient, x0
+        
+    def best1(self, val, accelerate=False):
+        if accelerate:
+            try:
+                if len(glob.glob(f'cpp/build/*.so')):
+                    orient, x0 = self.best1_c(val)
+                    
+                    return orient, x0
+                else:
+                    warnings.warn('cpp extension not found, please run build.sh to build it first!')
+            except ImportError as e:
+                warnings.warn(f'failed to load c extensions, {e}')
+                pass
+            
+        orient, x0, _ = max((x for x in self.next_states(val)), key=lambda x: x[-1].score())
         return orient, x0
     
     def best2(self, val1, val2, accelerate=False):
         if accelerate:
-            sys.path.append('./cpp/build')
             try:
                 if len(glob.glob(f'cpp/build/*.so')):
                     orient, x0 = self.best2_c(val1, val2)
@@ -112,6 +138,41 @@ class State:
                     best_orient = orient
                     best_x0 = x0
         return best_orient, best_x0
+    
+    def worst_block1_c(self):
+        sys.path.append('./cpp/build')
+        import Tetris
+        state = Tetris.State(self.board.astype(int).tolist())
+        val = state.worst_block1()
+        return val
+    
+    def worst_block2_c(self, val):
+        sys.path.append('./cpp/build')
+        import Tetris
+        state = Tetris.State(self.board.astype(int).tolist())
+        val2 = state.worst_block2(val)
+        return val2
+    
+    def easiest_block2_c(self, val):
+        sys.path.append('./cpp/build')
+        import Tetris
+        state = Tetris.State(self.board.astype(int).tolist())
+        val2 = state.easiest_block2(val)
+        return val2
+        
+    def worst_block2(self, val, accelerate=False):
+        if accelerate:
+            try:
+                if len(glob.glob(f'cpp/build/*.so')):
+                    val2 = self.worst_block2_c(val)
+                    return val2
+                else:
+                    warnings.warn('cpp extension not found, please run build.sh to build it first!')
+            except ImportError as e:
+                warnings.warn(f'failed to load c extensions, {e}')
+                pass
+        
+        raise NotImplementedError('Only supports C++ version')
     
     def check_line_clear(self, layers):
         new_grid = []
@@ -180,20 +241,22 @@ class State:
 
 
 class PyTris:
-    def __init__(self, w=10, h=20, autoplay=False, turbo=False):
+    def __init__(self, w=10, h=20, autoplay=False, turbo=False, mode=Mode.medium):
+        self.val = random.choice(list(shapes_.keys()))
+        self.next = random.choice(list(shapes.keys()))
+        
         self.w = w
         self.h = h
         self.autoplay = autoplay
         self.turbo = turbo
+        self.mode = mode
         
         self.state = State(np.zeros((h, w)))
         self.view = np.zeros_like(self.state.board)  # 实际显示时绘制的视图
         
         self.orient = 0
-        self.val = 0
-        self.pos_x, self.pos_y = 0, 0
         
-        self.shape_queue = deque(*[random.choices(list(shapes.keys()), k=2)])
+        self.pos_x, self.pos_y = 0, 0
         
         self.score = 0
         self.game_over = False
@@ -203,30 +266,39 @@ class PyTris:
         self.score = 0
         self.state = State(np.zeros((self.h, self.w)))
         self.view = np.zeros_like(self.state.board)
-        self.shape_queue = deque(*[random.choices(list(shapes.keys()), k=2)])
         
         # 游戏开始时生成第一个方块
-        self.spawn_piece(self.autoplay)
+        self.spawn_piece()
     
-    def spawn_piece(self, autoplay=False):
-        self.shape_queue.popleft()
-        self.shape_queue.append(random.choice(list(shapes.keys())))
+    def spawn_piece(self):
+        next_orient = random.randint(0, 3)
+        if self.mode == Mode.extreme:
+            self.next = None
+            self.val = self.state.worst_block1_c()
+        elif self.mode == Mode.hard:
+            next = (self.state.worst_block2_c(self.val), next_orient)
+            (self.val, self.orient), self.next = self.next, next
+        elif self.mode == Mode.easy:
+            next = (self.state.easiest_block2_c(self.val), next_orient)
+            (self.val, self.orient), self.next = self.next, next
+        else:  # medium
+            next = random.choice(list(shapes.keys()))
+            (self.val, self.orient), self.next = self.next, next
         
-        self.val, self.orient = self.shape_queue[0]
         shape = np.array(shapes[(self.val, self.orient)])
-        next_val, next_orient = self.shape_queue[1]
-        
-        # self.state = State(self.state.board.copy())
         
         x_max, y_max = np.max(shape, axis=0)  # x横向, y纵向
         x_min, y_min = np.min(shape, axis=0)
+        
         self.pos_y = - y_min
+        self.pos_x = random.randint(-x_min, self.w - 1 - x_max)
         
-        if autoplay:
-            self.orient, self.pos_x = self.state.best2(self.val, next_val, accelerate=self.turbo)
-        else:
-            self.pos_x = random.randint(-x_min, self.w - 1 - x_max)
-        
+        if self.autoplay:
+            if self.next is None:
+                self.orient, self.pos_x = self.state.best1(self.val, accelerate=self.turbo)
+            else:
+                self.orient, self.pos_x = self.state.best2(self.val, self.next[0], accelerate=self.turbo)
+            
         self.view = self.state.board.copy()  # 更新视图
         
         for dx, dy in shapes[(self.val, self.orient)]:
@@ -269,7 +341,7 @@ class PyTris:
                     self.score += self.check_line_clear()  # 更新得分
                     self.game_over = self.state.is_over()  # 判断胜负
                     if not self.game_over:
-                        self.spawn_piece(self.autoplay)  # 生成新块
+                        self.spawn_piece()  # 生成新块
                 return False
             
             new_view[y, x] = self.val

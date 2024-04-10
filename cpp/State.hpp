@@ -40,6 +40,13 @@ public:
     
     // 计算给定两个方块值的最佳放置
     std::pair<int, int> best2(int val1, int val2);
+
+    std::pair<int, int> best2_(int val1, int val2, int& max_score);
+
+    // 计算最差的下一个方块
+    int worstBlock2(int val);
+    int worstBlock1();
+    int easiestBlock2(int val);
 };
 
 #endif // STATE_HPP
