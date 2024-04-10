@@ -125,7 +125,7 @@ class TetrisGUI:
 
 
 if __name__ == '__main__':
-    game = PyTris(w=10, h=20, autoplay=True, turbo=True, mode=Mode.medium)
-    gui = TetrisGUI(game, drop_interval=2, fps=60, headless=False)
+    game = PyTris(w=10, h=20, autoplay=True, turbo=True, mode=Mode.easy, p=0.1)
+    gui = TetrisGUI(game, drop_interval=-2, fps=60, headless=False)
     game.start_game()
     gui.run()

@@ -241,7 +241,21 @@ class State:
 
 
 class PyTris:
-    def __init__(self, w=10, h=20, autoplay=False, turbo=False, mode=Mode.medium):
+    def __init__(self, w=10, h=20, autoplay=False, turbo=False, mode=Mode.medium, p=0.5):
+        """
+        
+        :param w:
+        :param h:
+        :param autoplay:
+        :param turbo:
+        :param mode: 难度模式：
+        :param p: 难度(0-1)
+        难度说明：
+        Mode.easy: 下一个方块以概率1-p出现最有利于玩家的那一个
+        Mode.medium: 下一个方块完全随机出现
+        Mode.hard: 下一个方块以概率p出现最不利于玩家的那一个
+        Mode.extreme: 禁用下一个方块提示，当前方块以概率p出现最不利于玩家的那一个
+        """
         self.val = random.choice(list(shapes_.keys()))
         self.next = random.choice(list(shapes.keys()))
         
@@ -250,6 +264,7 @@ class PyTris:
         self.autoplay = autoplay
         self.turbo = turbo
         self.mode = mode
+        self.p = p
         
         self.state = State(np.zeros((h, w)))
         self.view = np.zeros_like(self.state.board)  # 实际显示时绘制的视图
@@ -272,14 +287,15 @@ class PyTris:
     
     def spawn_piece(self):
         next_orient = random.randint(0, 3)
+        
         if self.mode == Mode.extreme:
             self.next = None
-            self.val = self.state.worst_block1_c()
+            self.val = self.state.worst_block1_c() if random.random() < self.p else random.randint(1, 7)
         elif self.mode == Mode.hard:
-            next = (self.state.worst_block2_c(self.val), next_orient)
+            next = (self.state.worst_block2_c(self.val), next_orient) if random.random() < self.p else random.choice(list(shapes.keys()))
             (self.val, self.orient), self.next = self.next, next
         elif self.mode == Mode.easy:
-            next = (self.state.easiest_block2_c(self.val), next_orient)
+            next = (self.state.easiest_block2_c(self.val), next_orient) if random.random() > self.p else random.choice(list(shapes.keys()))
             (self.val, self.orient), self.next = self.next, next
         else:  # medium
             next = random.choice(list(shapes.keys()))
