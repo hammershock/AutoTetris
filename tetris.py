@@ -259,6 +259,7 @@ class PyTris:
         :param mode: 难度模式：
         :param p: 难度(0-1)
         难度说明：
+        Mode.very_easy: 前方块以概率1-p出现最有利于玩家的那一个
         Mode.easy: 下一个方块以概率1-p出现最有利于玩家的那一个
         Mode.medium: 下一个方块完全随机出现
         Mode.hard: 下一个方块以概率p出现最不利于玩家的那一个
