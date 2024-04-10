@@ -132,7 +132,7 @@ def main():
     parser.add_argument("--height", "-H", type=int, default=20, help="游戏区域的高度")
     parser.add_argument("--autoplay", action="store_true", help="启用自动决策模式")
     parser.add_argument("--turbo", action="store_true", help="启用加速推理模式")
-    parser.add_argument("--mode", type=str, choices=['easy', 'medium', 'hard', 'extreme'], default="easy", help="游戏难度模式")
+    parser.add_argument("--mode", type=str, choices=['very-easy', 'easy', 'medium', 'hard', 'extreme'], default="easy", help="游戏难度模式")
     parser.add_argument("--probability", "-p", type=float, default=0.1, help="特殊方块出现的概率")
     parser.add_argument("--drop-interval", type=float, default=1.0, help="方块下落间隔")
     parser.add_argument("--fps", type=int, default=60, help="帧率")
@@ -141,6 +141,7 @@ def main():
     args = parser.parse_args()
     
     mode_mapping = {
+        'very-easy': Mode.very_easy,
         'easy': Mode.easy,
         'medium': Mode.medium,
         'hard': Mode.hard,

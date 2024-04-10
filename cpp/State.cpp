@@ -180,18 +180,22 @@ int State::score(){
 
 
 pair<int, int> State::best1(int value){
-std::unordered_map<int, Piece> piece_map = create_pieces();
-auto ret = this->nextStates(value, piece_map);
-int max_score = INT16_MIN;
-int max_orient = -1, max_x0 = -1;
-for (auto &[orient, x0, state]: ret){
-    int score = state->score();
-        if (score > max_score){
-            max_score = score;
-            max_orient = orient;
-            max_x0 = x0;
+    int max_score = INT16_MIN;
+    return best1_(value, max_score);
+}
+
+std::pair<int, int> State::best1_(int value, int& max_score){
+    std::unordered_map<int, Piece> piece_map = create_pieces();
+    auto ret = this->nextStates(value, piece_map);
+    int max_orient = -1, max_x0 = -1;
+    for (auto &[orient, x0, state]: ret){
+        int score = state->score();
+            if (score > max_score){
+                max_score = score;
+                max_orient = orient;
+                max_x0 = x0;
+            }
         }
-    }
 return make_pair(max_orient, max_x0);
 }
 
@@ -248,6 +252,20 @@ int State::worstBlock1(){
         }
     }
     return worst_val;
+}
+
+int State::easiestBlock1(){
+int max_best_score = INT16_MIN;
+int best_val = -1;
+for (int val = 1; val < 8; val++){
+    int score = INT16_MIN;
+    auto [orient, x0] = this->best1_(val, score);
+    if (score > max_best_score){
+        max_best_score = score;
+        best_val = val;
+    }
+}
+return best_val;
 }
 
 int State::easiestBlock2(int val){

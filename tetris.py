@@ -26,6 +26,7 @@ shapes = {(val, orient): tuple(rotate(shapes_[val], orient)) for val in shapes_.
 
 
 class Mode(Enum):
+    very_easy = auto()
     easy = auto()
     medium = auto()
     hard = auto()
@@ -152,6 +153,13 @@ class State:
         state = Tetris.State(self.board.astype(int).tolist())
         val2 = state.worst_block2(val)
         return val2
+    
+    def easiest_block1_c(self):
+        sys.path.append('./cpp/build')
+        import Tetris
+        state = Tetris.State(self.board.astype(int).tolist())
+        val = state.easiest_block1()
+        return val
     
     def easiest_block2_c(self, val):
         sys.path.append('./cpp/build')
@@ -291,12 +299,17 @@ class PyTris:
         if self.mode == Mode.extreme:
             self.next = None
             self.val = self.state.worst_block1_c() if random.random() < self.p else random.randint(1, 7)
+            self.orient = np.random.randint(0, 3)
         elif self.mode == Mode.hard:
             next = (self.state.worst_block2_c(self.val), next_orient) if random.random() < self.p else random.choice(list(shapes.keys()))
             (self.val, self.orient), self.next = self.next, next
         elif self.mode == Mode.easy:
             next = (self.state.easiest_block2_c(self.val), next_orient) if random.random() > self.p else random.choice(list(shapes.keys()))
             (self.val, self.orient), self.next = self.next, next
+        elif self.mode == Mode.very_easy:
+            self.next = None
+            self.val = self.state.easiest_block1_c()
+            self.orient = np.random.randint(0, 3)
         else:  # medium
             next = random.choice(list(shapes.keys()))
             (self.val, self.orient), self.next = self.next, next
@@ -314,7 +327,7 @@ class PyTris:
                 self.orient, self.pos_x = self.state.best1(self.val, accelerate=self.turbo)
             else:
                 self.orient, self.pos_x = self.state.best2(self.val, self.next[0], accelerate=self.turbo)
-            
+
         self.view = self.state.board.copy()  # 更新视图
         
         for dx, dy in shapes[(self.val, self.orient)]:

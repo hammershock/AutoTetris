@@ -37,6 +37,8 @@ public:
     
     // 计算给定方块值的最佳放置
     std::pair<int, int> best1(int value);
+
+    std::pair<int, int> best1_(int value, int& max_score);
     
     // 计算给定两个方块值的最佳放置
     std::pair<int, int> best2(int val1, int val2);
@@ -46,6 +48,7 @@ public:
     // 计算最差的下一个方块
     int worstBlock2(int val);
     int worstBlock1();
+    int easiestBlock1();
     int easiestBlock2(int val);
 };
 

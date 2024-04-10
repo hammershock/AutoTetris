@@ -27,5 +27,8 @@
  python gui.py --autoplay --turbo --drop-interval -1 --mode easy
 ```
   
+```bash
+python gui.py --autoplay --turbo --drop-interval -1 --mode medium --headless
+```
 [参考资料](https://blog.csdn.net/Originum/article/details/81570042 "俄罗斯方块人工智能 [AI]")
 
