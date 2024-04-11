@@ -241,11 +241,9 @@ std::vector<std::pair<int, int>> State::scores2(int val) {
 std::vector<std::pair<int, int>> State::scores1(){
     std::vector<std::pair<int, int>> scores; // 存储val2和对应的score
     for (int val = 1; val < 8; val++){
-        for (int val2 = 1; val2 < 8; val2++){
-            int score = INT32_MIN;
-            auto [orient, x0] = this->best2_(val, val2, score);
-            scores.emplace_back(val, score); // 存储val2和它的score
-        }
+        int score = INT32_MIN;
+        auto [orient, x0] = this->best1_(val, score);
+        scores.emplace_back(val, score); // 存储val2和它的score
     }
     std::sort(scores.begin(), scores.end(), [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
             return a.second < b.second; // 使用score作为排序依据

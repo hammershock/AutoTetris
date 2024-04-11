@@ -255,7 +255,7 @@ class State:
 
 
 class PyTris:
-    def __init__(self, w=10, h=20, autoplay=False, turbo=False, bag7=False, mode=Mode.medium):
+    def __init__(self, w=10, h=20, autoplay=False, turbo=False, bag7=True, mode=Mode.medium):
         """
         
         :param w:

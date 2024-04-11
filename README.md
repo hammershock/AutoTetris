@@ -25,7 +25,7 @@
 
 简单模式，立即下落，自动模式，不使用bag7生成算法：
 ```bash
- python gui.py --autoplay --turbo --drop-interval -1 --mode easy --fps 60
+ python gui.py --autoplay --turbo --drop-interval -1 --mode very-easy --fps 60
 ```
 
 中等难度，立即下落，自动模式，不显示界面
