@@ -153,7 +153,6 @@ class State:
             try:
                 if len(glob.glob(f'cpp/build/*.so')):
                     orient, x0 = self.best1_c(val)
-                    
                     return orient, x0
                 else:
                     warnings.warn('cpp extension not found, please run build.sh to build it first!')
@@ -188,20 +187,6 @@ class State:
                     best_orient = orient
                     best_x0 = x0
         return best_orient, best_x0
-    
-    def worst_block2(self, val, accelerate=False):
-        if accelerate:
-            try:
-                if len(glob.glob(f'cpp/build/*.so')):
-                    val2 = self.scores2_c(val)[-1][0]
-                    return val2
-                else:
-                    warnings.warn('cpp extension not found, please run build.sh to build it first!')
-            except ImportError as e:
-                warnings.warn(f'failed to load c extensions, {e}')
-                pass
-        
-        raise NotImplementedError('Only supports C++ version')
     
     def check_line_clear(self, layers):
         new_grid = []
@@ -270,7 +255,7 @@ class State:
 
 
 class PyTris:
-    def __init__(self, w=10, h=20, autoplay=False, turbo=False, bag7=False, mode=Mode.medium, p=0.5):
+    def __init__(self, w=10, h=20, autoplay=False, turbo=False, bag7=False, mode=Mode.medium):
         """
         
         :param w:
@@ -278,13 +263,12 @@ class PyTris:
         :param autoplay:
         :param turbo:
         :param mode: 难度模式：
-        :param p: 难度(0-1)
         难度说明：
-        Mode.very_easy: 前方块以概率1-p出现最有利于玩家的那一个
-        Mode.easy: 下一个方块以概率1-p出现最有利于玩家的那一个
+        Mode.very_easy: 前方块在可选方块中出现最有利于玩家的那一个
+        Mode.easy: 下一个方块在可选方块中出现最有利于玩家的那一个
         Mode.medium: 下一个方块完全随机出现
-        Mode.hard: 下一个方块以概率p出现最不利于玩家的那一个
-        Mode.extreme: 禁用下一个方块提示，且当前方块以概率p出现最不利于玩家的那一个
+        Mode.hard: 下一个方块以在可选方块中出现最不利于玩家的那一个
+        Mode.extreme: 禁用下一个方块提示，且当前方块出现在可选方块中最不利于玩家的那一个
         """
         self.val = random.choice(list(shapes_.keys()))
         self.next = random.choice(list(shapes.keys()))

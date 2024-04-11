@@ -18,24 +18,24 @@
   - medium: 下一个方块完全随机出现
   - hard: 下一个方块以概率p出现最不利于玩家的那一个
   - extreme: 禁用下一个方块提示，且当前方块以概率p出现最不利于玩家的那一个
-- `p` 可以进一步调节难度，越大越难，范围在0-1之间
 - `drop-interval` 方块下落时间间隔，置0不自动下落，负值立即下落
 - `fps` 游戏GUI刷新帧率
 - `headless` 开启无头模式，即不显示GUI，以最大速率运行
 - `bag7-disabled` 禁用bag7生成算法，改用纯随机生成。默认使用bag7算法生成方块，避免纯随机导致的极端结果，有利于提升游戏公平性
 
-简单模式，立即下落，自动模式：
+简单模式，立即下落，自动模式，不使用bag7生成算法：
 ```bash
- python gui.py --autoplay --turbo --drop-interval -1 --mode easy --fps 120
+ python gui.py --autoplay --turbo --drop-interval -1 --mode easy --fps 60
 ```
 
-中等难度，立即下落，自动模式，不显示界面, 使用bag7方块生成算法
+中等难度，立即下落，自动模式，不显示界面
 ```bash
 python gui.py --autoplay --turbo --drop-interval -1 --mode medium --headless
 ```
 
 ```bash
-python gui.py --turbo --drop-interval -2 --mode extreme -p 1 --autoplay
+python gui.py --turbo --drop-interval -2 --mode extreme --autoplay --bag7-disabled
 ```
+
 [参考资料](https://blog.csdn.net/Originum/article/details/81570042 "俄罗斯方块人工智能 [AI]")
 
