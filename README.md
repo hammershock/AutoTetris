@@ -23,19 +23,11 @@
 - `headless` 开启无头模式，即不显示GUI，以最大速率运行
 - `bag7-disabled` 禁用bag7生成算法，改用纯随机生成。默认使用bag7算法生成方块，避免纯随机导致的极端结果，有利于提升游戏公平性
 
-简单模式，立即下落，自动模式，不使用bag7生成算法：
-```bash
- python gui.py --autoplay --turbo --drop-interval -1 --mode very-easy --fps 60
-```
-
-中等难度，立即下落，自动模式，不显示界面
-```bash
-python gui.py --autoplay --turbo --drop-interval -1 --mode medium --headless
-```
 
 ```bash
-python gui.py --turbo --drop-interval -2 --mode extreme --autoplay --bag7-disabled
+ python gui.py
 ```
+
 
 [参考资料](https://blog.csdn.net/Originum/article/details/81570042 "俄罗斯方块人工智能 [AI]")
 

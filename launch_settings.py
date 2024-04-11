@@ -46,7 +46,7 @@ def launch_settings_window():
 
     success = False
     
-    def on_start():
+    def on_start(*args):
         settings['width'] = int(width_var.get())
         settings['height'] = int(height_var.get())
         settings['autoplay'] = autoplay_var.get()
@@ -106,7 +106,11 @@ def launch_settings_window():
     tk.Checkbutton(root, text="Disable Auto Drop", variable=disable_auto_drop_var).grid(row=10, column=0, columnspan=2)
     
     # Start Button
-    tk.Button(root, text="Start Game", command=on_start).grid(row=11, column=0, columnspan=2)
+    start_button = tk.Button(root, text="Start Game", command=on_start)
+    start_button.grid(row=11, column=0, columnspan=2)
+    
+    # 绑定Enter键到on_start函数
+    root.bind('<Return>', on_start)
     
     root.mainloop()
     return settings, success
