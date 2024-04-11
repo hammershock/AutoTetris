@@ -1,0 +1,13 @@
+{
+    "width": 10,
+    "height": 20,
+    "autoplay": true,
+    "turbo": true,
+    "mode": "medium",
+    "drop_interval": 1.0,
+    "fps": 60,
+    "headless": true,
+    "bag7": true,
+    "instant_drop": true,
+    "disable_auto_drop": false
+}

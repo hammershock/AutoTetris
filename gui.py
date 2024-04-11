@@ -4,6 +4,7 @@ import pygame
 from tqdm import tqdm
 
 from tetris import PyTris, Mode
+from launch_settings import launch_settings_window
 
 
 class TetrisGUI:
@@ -126,19 +127,27 @@ class TetrisGUI:
                 self.clock.tick(self.fps)  # 稳定以fps循环
 
 
-def main():
+def parse_args():
     parser = argparse.ArgumentParser(description="Start Game PyTris")
     parser.add_argument("--width", "-W", type=int, default=10, help="游戏区域的宽度")
     parser.add_argument("--height", "-H", type=int, default=20, help="游戏区域的高度")
     parser.add_argument("--autoplay", action="store_true", help="启用自动决策模式")
     parser.add_argument("--turbo", action="store_true", help="启用加速推理模式")
-    parser.add_argument("--mode", type=str, choices=['very-easy', 'easy', 'medium', 'hard', 'extreme'], default="easy", help="游戏难度模式")
+    parser.add_argument("--mode", type=str, choices=['very-easy', 'easy', 'medium', 'hard', 'extreme'], default="easy",
+                        help="游戏难度模式")
     parser.add_argument("--drop-interval", type=float, default=1.0, help="方块下落间隔")
     parser.add_argument("--fps", type=int, default=60, help="帧率")
     parser.add_argument("--headless", action="store_true", help="启用无头模式（不显示GUI）")
     parser.add_argument("--bag7-disabled", action="store_true", help="禁用改进的方块生成算法bag7")
     
     args = parser.parse_args()
+    return args
+
+
+def main():
+    settings, success = launch_settings_window()
+    if not success:
+        return
     
     mode_mapping = {
         'very-easy': Mode.very_easy,
@@ -148,11 +157,11 @@ def main():
         'extreme': Mode.extreme
     }
     
-    game_mode = mode_mapping.get(args.mode, Mode.easy)
+    game_mode = mode_mapping.get(settings['mode'], Mode.easy)
     
-    game = PyTris(w=args.width, h=args.height, autoplay=args.autoplay, turbo=args.turbo, mode=game_mode,
-                  bag7=not args.bag7_disabled)
-    gui = TetrisGUI(game, drop_interval=args.drop_interval, fps=args.fps, headless=args.headless)
+    game = PyTris(w=settings['width'], h=settings['height'], autoplay=settings['autoplay'],
+                  turbo=settings['turbo'], mode=game_mode, bag7=settings['bag7'])
+    gui = TetrisGUI(game, drop_interval=-1 if settings['instant_drop'] else (0 if settings['disable_auto_drop'] else settings['drop_interval']), fps=settings['fps'], headless=settings['headless'])
     game.start_game()
     gui.run()
 

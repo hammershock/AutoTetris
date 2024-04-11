@@ -147,7 +147,7 @@ class State:
         state = Tetris.State(self.board.astype(int).tolist())
         val2 = state.scores2(val)
         return val2
-
+        
     def best1(self, val, accelerate=False):
         if accelerate:
             try:
