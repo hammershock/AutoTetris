@@ -280,7 +280,6 @@ class PyTris:
         self.mode = mode
         self.bag7 = bag7
         self.bag = Bag7(bag7)
-        self.p = p
         
         self.state = State(np.zeros((h, w)))
         self.view = np.zeros_like(self.state.board)  # 实际显示时绘制的视图
