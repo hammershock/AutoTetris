@@ -28,9 +28,9 @@
  python gui.py --autoplay --turbo --drop-interval -1 --mode easy
 ```
 
-中等难度，立即下落，自动模式，不显示界面
+中等难度，立即下落，自动模式，不显示界面, 使用bag7方块生成算法
 ```bash
-python gui.py --autoplay --turbo --drop-interval -1 --mode medium --headless
+python gui.py --autoplay --turbo --drop-interval -1 --mode medium --bag7 --headless
 ```
 
 ```bash

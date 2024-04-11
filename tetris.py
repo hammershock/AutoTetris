@@ -251,7 +251,7 @@ class State:
 
 
 class PyTris:
-    def __init__(self, w=10, h=20, autoplay=False, turbo=False, mode=Mode.medium, p=0.5):
+    def __init__(self, w=10, h=20, autoplay=False, turbo=False, bag7=False, mode=Mode.medium, p=0.5):
         """
         
         :param w:
@@ -275,6 +275,8 @@ class PyTris:
         self.autoplay = autoplay
         self.turbo = turbo
         self.mode = mode
+        self.bag7 = bag7
+        self.bag = [1, 2, 3, 4, 5, 6, 7]
         self.p = p
         
         self.state = State(np.zeros((h, w)))
@@ -295,26 +297,36 @@ class PyTris:
         
         # 游戏开始时生成第一个方块
         self.spawn_piece()
+        
+    def random_piece(self):
+        if self.bag7:
+            if len(self.bag) == 0:
+                self.bag = list(range(1, 8))
+            random.shuffle(self.bag)
+            return self.bag.pop()
+        return random.randint(1, 7)
+        
     
     def spawn_piece(self):
         next_orient = random.randint(0, 3)
         
         if self.mode == Mode.extreme:
             self.next = None
-            self.val = self.state.worst_block1_c() if random.random() < self.p else random.randint(1, 7)
+            self.val = self.state.worst_block1_c() if random.random() < self.p else self.random_piece()
             self.orient = np.random.randint(0, 3)
         elif self.mode == Mode.hard:
-            next = (self.state.worst_block2_c(self.val), next_orient) if random.random() < self.p else random.choice(list(shapes.keys()))
+            
+            next = (self.state.worst_block2_c(self.val), next_orient) if random.random() < self.p else (self.random_piece(), next_orient)
             (self.val, self.orient), self.next = self.next, next
         elif self.mode == Mode.easy:
-            next = (self.state.easiest_block2_c(self.val), next_orient) if random.random() > self.p else random.choice(list(shapes.keys()))
+            next = (self.state.easiest_block2_c(self.val), next_orient) if random.random() > self.p else (self.random_piece(), next_orient)
             (self.val, self.orient), self.next = self.next, next
         elif self.mode == Mode.very_easy:
             self.next = None
             self.val = self.state.easiest_block1_c()
             self.orient = np.random.randint(0, 3)
         else:  # medium
-            next = random.choice(list(shapes.keys()))
+            next = (self.random_piece(), next_orient)
             (self.val, self.orient), self.next = self.next, next
         
         shape = np.array(shapes[(self.val, self.orient)])
