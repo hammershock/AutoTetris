@@ -4,6 +4,7 @@
 #include<unordered_set>
 #include<tuple>
 #include<queue>
+#include<algorithm>
 #include<cmath>
 #include<memory>
 #include"Piece.hpp"
@@ -200,7 +201,7 @@ return make_pair(max_orient, max_x0);
 }
 
 std::pair<int, int> State::best2(int val1, int val2){
-    int max_score = INT16_MIN;
+    int max_score = INT32_MIN;
     return best2_(val1, val2, max_score);
 }
 
@@ -224,60 +225,30 @@ std::pair<int, int> State::best2_(int val1, int val2, int& max_score){
     return make_pair(max_orient, max_x0);
 }
 
-int State::worstBlock2(int val){
-    int min_best_score = INT16_MAX;
-    int worst_val2 = -1;
-    for (int val2 = 1; val2 < 8; val2++){
-            int score = INT16_MIN;
-            auto [orient, x0] = this->best2_(val, val2, score);
-            if (score < min_best_score){
-                min_best_score = score;
-                worst_val2 = val2;
-            }
-        }
-    return worst_val2;
-}
+std::vector<std::pair<int, int>> State::scores2(int val) {
+    std::vector<std::pair<int, int>> scores; // 存储val2和对应的score
+    for (int val2 = 1; val2 < 8; val2++) {
+        int score = INT32_MIN;
+        auto [orient, x0] = this->best2_(val, val2, score);
+        scores.emplace_back(val2, score); // 存储val2和它的score
+    }
+    std::sort(scores.begin(), scores.end(), [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+            return a.second < b.second; // 使用score作为排序依据
+        });
+    return scores;
+    }
 
-int State::worstBlock1(){
-    int min_best_score = INT16_MAX;
-    int worst_val = -1;
+std::vector<std::pair<int, int>> State::scores1(){
+    std::vector<std::pair<int, int>> scores; // 存储val2和对应的score
     for (int val = 1; val < 8; val++){
         for (int val2 = 1; val2 < 8; val2++){
-            int score = INT16_MIN;
+            int score = INT32_MIN;
             auto [orient, x0] = this->best2_(val, val2, score);
-            if (score < min_best_score){
-                min_best_score = score;
-                worst_val = val;
-            }
+            scores.emplace_back(val, score); // 存储val2和它的score
         }
     }
-    return worst_val;
-}
-
-int State::easiestBlock1(){
-int max_best_score = INT16_MIN;
-int best_val = -1;
-for (int val = 1; val < 8; val++){
-    int score = INT16_MIN;
-    auto [orient, x0] = this->best1_(val, score);
-    if (score > max_best_score){
-        max_best_score = score;
-        best_val = val;
-    }
-}
-return best_val;
-}
-
-int State::easiestBlock2(int val){
-    int max_best_score = INT16_MIN;
-    int best_val = -1;
-    for (int val2 = 1; val2 < 8; val2++){
-        int score = INT16_MIN;
-        auto [orient, x0] = this->best2_(val, val2, score);
-        if (score > max_best_score){
-            max_best_score = score;
-            best_val = val2;
-        }
-    }
-    return best_val;
+    std::sort(scores.begin(), scores.end(), [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+            return a.second < b.second; // 使用score作为排序依据
+        });
+    return scores;
 }

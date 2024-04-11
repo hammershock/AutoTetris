@@ -137,7 +137,7 @@ def main():
     parser.add_argument("--drop-interval", type=float, default=1.0, help="方块下落间隔")
     parser.add_argument("--fps", type=int, default=60, help="帧率")
     parser.add_argument("--headless", action="store_true", help="启用无头模式（不显示GUI）")
-    parser.add_argument("--bag7", action="store_true", help="启用改进的方块生成算法bag7")
+    parser.add_argument("--bag7-disabled", action="store_true", help="禁用改进的方块生成算法bag7")
     
     args = parser.parse_args()
     
@@ -152,7 +152,7 @@ def main():
     game_mode = mode_mapping.get(args.mode, Mode.easy)
     
     game = PyTris(w=args.width, h=args.height, autoplay=args.autoplay, turbo=args.turbo, mode=game_mode,
-                  p=args.probability, bag7=args.bag7)
+                  p=args.probability, bag7=not args.bag7_disabled)
     gui = TetrisGUI(game, drop_interval=args.drop_interval, fps=args.fps, headless=args.headless)
     game.start_game()
     gui.run()

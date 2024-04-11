@@ -45,11 +45,9 @@ public:
 
     std::pair<int, int> best2_(int val1, int val2, int& max_score);
 
-    // 计算最差的下一个方块
-    int worstBlock2(int val);
-    int worstBlock1();
-    int easiestBlock1();
-    int easiestBlock2(int val);
+    std::vector<std::pair<int, int>> scores2(int val);
+
+    std::vector<std::pair<int, int>> scores1();
 };
 
 #endif // STATE_HPP

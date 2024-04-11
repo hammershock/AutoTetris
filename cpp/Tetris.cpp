@@ -9,8 +9,6 @@ PYBIND11_MODULE(Tetris, m) {
         .def(py::init<const std::vector<std::vector<int>>&>())
         .def("best1", &State::best1, py::arg("value"))
         .def("best2", &State::best2, py::arg("val1"), py::arg("val2"))
-        .def("worst_block1", &State::worstBlock1)
-        .def("worst_block2", &State::worstBlock2, py::arg("val"))
-        .def("easiest_block1", &State::easiestBlock1)
-        .def("easiest_block2", &State::easiestBlock2, py::arg("val"));
+        .def("scores1", &State::scores1)
+        .def("scores2", &State::scores2, py::arg("val"));
 }

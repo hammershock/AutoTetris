@@ -34,6 +34,39 @@ class Mode(Enum):
     hard = auto()
     extreme = auto()
     
+
+class Bag7:
+    def __init__(self, bag7_on):
+        self.bag7_on = bag7_on
+        self.bag_ = list(range(1, 8))
+        
+    def __contains__(self, item):
+        if self.bag7_on:
+            return item in self.bag_
+        else:
+            return item in range(1, 8)
+    
+    def fill_if_empty(self):
+        if len(self.bag_) == 0:
+            self.bag_ = list(range(1, 8))
+    
+    def pop(self):
+        if self.bag7_on:
+            self.fill_if_empty()
+            random.shuffle(self.bag_)
+            return self.bag_.pop()
+        return random.choice(self.bag_)
+    
+    def remove(self, item):
+        if not self.bag7_on:
+            return
+        
+        if item in self.bag_:
+            self.bag_.remove(item)
+            self.fill_if_empty()
+        else:
+            raise KeyError(item)
+    
     
 class State:
     def __init__(self, board, landing_height=0):
@@ -100,7 +133,21 @@ class State:
         state = Tetris.State(self.board.astype(int).tolist())
         orient, x0 = state.best1(val)
         return orient, x0
-        
+    
+    def scores1_c(self):
+        sys.path.append('./cpp/build')
+        import Tetris
+        state = Tetris.State(self.board.astype(int).tolist())
+        val = state.scores1()
+        return val
+    
+    def scores2_c(self, val):
+        sys.path.append('./cpp/build')
+        import Tetris
+        state = Tetris.State(self.board.astype(int).tolist())
+        val2 = state.scores2(val)
+        return val2
+
     def best1(self, val, accelerate=False):
         if accelerate:
             try:
@@ -142,39 +189,11 @@ class State:
                     best_x0 = x0
         return best_orient, best_x0
     
-    def worst_block1_c(self):
-        sys.path.append('./cpp/build')
-        import Tetris
-        state = Tetris.State(self.board.astype(int).tolist())
-        val = state.worst_block1()
-        return val
-    
-    def worst_block2_c(self, val):
-        sys.path.append('./cpp/build')
-        import Tetris
-        state = Tetris.State(self.board.astype(int).tolist())
-        val2 = state.worst_block2(val)
-        return val2
-    
-    def easiest_block1_c(self):
-        sys.path.append('./cpp/build')
-        import Tetris
-        state = Tetris.State(self.board.astype(int).tolist())
-        val = state.easiest_block1()
-        return val
-    
-    def easiest_block2_c(self, val):
-        sys.path.append('./cpp/build')
-        import Tetris
-        state = Tetris.State(self.board.astype(int).tolist())
-        val2 = state.easiest_block2(val)
-        return val2
-        
     def worst_block2(self, val, accelerate=False):
         if accelerate:
             try:
                 if len(glob.glob(f'cpp/build/*.so')):
-                    val2 = self.worst_block2_c(val)
+                    val2 = self.scores2_c(val)[-1][0]
                     return val2
                 else:
                     warnings.warn('cpp extension not found, please run build.sh to build it first!')
@@ -276,7 +295,7 @@ class PyTris:
         self.turbo = turbo
         self.mode = mode
         self.bag7 = bag7
-        self.bag = [1, 2, 3, 4, 5, 6, 7]
+        self.bag = Bag7(bag7)
         self.p = p
         
         self.state = State(np.zeros((h, w)))
@@ -297,37 +316,29 @@ class PyTris:
         
         # 游戏开始时生成第一个方块
         self.spawn_piece()
-        
-    def random_piece(self):
-        if self.bag7:
-            if len(self.bag) == 0:
-                self.bag = list(range(1, 8))
-            random.shuffle(self.bag)
-            return self.bag.pop()
-        return random.randint(1, 7)
-        
-    
+
     def spawn_piece(self):
         next_orient = random.randint(0, 3)
         
         if self.mode == Mode.extreme:
             self.next = None
-            self.val = self.state.worst_block1_c() if random.random() < self.p else self.random_piece()
-            self.orient = np.random.randint(0, 3)
+            self.val, self.orient = next(val for val, _ in self.state.scores1_c() if val in self.bag), next_orient
+            self.bag.remove(self.val)
         elif self.mode == Mode.hard:
-            
-            next = (self.state.worst_block2_c(self.val), next_orient) if random.random() < self.p else (self.random_piece(), next_orient)
-            (self.val, self.orient), self.next = self.next, next
+            block_id = next(val for val, _ in self.state.scores2_c(self.val) if val in self.bag)
+            self.bag.remove(block_id)
+            (self.val, self.orient), self.next = self.next, (block_id, next_orient)
         elif self.mode == Mode.easy:
-            next = (self.state.easiest_block2_c(self.val), next_orient) if random.random() > self.p else (self.random_piece(), next_orient)
-            (self.val, self.orient), self.next = self.next, next
+            block_id = next(val for val, _ in reversed(self.state.scores2_c(self.val)) if val in self.bag)
+            self.bag.remove(block_id)
+            (self.val, self.orient), self.next = self.next, (block_id, next_orient)
         elif self.mode == Mode.very_easy:
             self.next = None
-            self.val = self.state.easiest_block1_c()
-            self.orient = np.random.randint(0, 3)
+            self.val, self.orient = next(val for val, _ in reversed(self.state.scores1_c()) if val in self.bag), next_orient
+            self.bag.remove(self.val)
         else:  # medium
-            next = (self.random_piece(), next_orient)
-            (self.val, self.orient), self.next = self.next, next
+            self.val, self.orient = self.next
+            self.next = self.bag.pop(), next_orient
         
         shape = np.array(shapes[(self.val, self.orient)])
         

@@ -22,20 +22,20 @@
 - `drop-interval` 方块下落时间间隔，置0不自动下落，负值立即下落
 - `fps` 游戏GUI刷新帧率
 - `headless` 开启无头模式，即不显示GUI，以最大速率运行
-- `bag7` 使用bag7生成算法，避免纯随机导致的极端方块生成结果，提升游戏公平性
+- `bag7-disabled` 禁用bag7生成算法，改用纯随机生成。默认使用bag7算法生成方块，避免纯随机导致的极端结果，有利于提升游戏公平性
 
 简单模式，立即下落，自动模式：
 ```bash
- python gui.py --autoplay --turbo --drop-interval -1 --mode easy
+ python gui.py --autoplay --turbo --drop-interval -1 --mode easy --fps 120
 ```
 
 中等难度，立即下落，自动模式，不显示界面, 使用bag7方块生成算法
 ```bash
-python gui.py --autoplay --turbo --drop-interval -1 --mode medium --bag7 --headless
+python gui.py --autoplay --turbo --drop-interval -1 --mode medium --headless
 ```
 
 ```bash
-python gui.py --turbo --drop-interval 2 --mode extreme -p 1
+python gui.py --turbo --drop-interval -2 --mode extreme -p 1 --autoplay
 ```
 [参考资料](https://blog.csdn.net/Originum/article/details/81570042 "俄罗斯方块人工智能 [AI]")
 
