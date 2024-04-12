@@ -1,6 +1,7 @@
 # 自动求解的俄罗斯方块AutoTetris
 
-![效果展示](https://github.com/hammershock/AutoTetris/assets/109429530/9ee114e3-ef62-406e-a5de-76b53452873e)
+![效果展示](https://github.com/hammershock/AutoTetris/assets/109429530/3e32731e-a62c-4a58-a374-616f5a6f8d2a)
+
 
 - 使用Pierre Dellacherie评估算法
 - 可供选择的bag7生成函数
